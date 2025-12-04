@@ -13,7 +13,6 @@ function App() {
       console.error("Error fetching items:", error);
     }
   };
-
   fetchItems();
 }, []);
 
