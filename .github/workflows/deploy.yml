@@ -78,22 +78,10 @@ jobs:
             echo "Logging into GHCR..."
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-            echo "Trying to pull images (will fail if first deploy)..."
+            echo "Pulling images..."
             docker pull ghcr.io/${{ steps.repo_lower.outputs.repo_lower }}/backend:latest || true
             docker pull ghcr.io/${{ steps.repo_lower.outputs.repo_lower }}/frontend:latest || true
 
-            echo "Checking if backend image exists locally..."
-            if ! docker images ghcr.io/${{ steps.repo_lower.outputs.repo_lower }}/backend:latest | awk 'NR>1 {print $1}' | grep -q .; then
-              echo "Backend image not found — building on EC2..."
-              docker build -t ghcr.io/${{ steps.repo_lower.outputs.repo_lower }}/backend:latest ./backend
-            fi
-
-            echo "Checking if frontend image exists locally..."
-            if ! docker images ghcr.io/${{ steps.repo_lower.outputs.repo_lower }}/frontend:latest | awk 'NR>1 {print $1}' | grep -q .; then
-              echo "Frontend image not found — building on EC2..."
-              docker build -t ghcr.io/${{ steps.repo_lower.outputs.repo_lower }}/frontend:latest ./frontend
-            fi
-
             echo "Starting docker-compose..."
             docker compose down
-            docker compose up -d --build --remove-orphans
+            docker compose up -d --remove-orphans
